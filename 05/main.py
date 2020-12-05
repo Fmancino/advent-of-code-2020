@@ -9,7 +9,6 @@ def parse_in(std_in):
     for line in std_in:
         row = iterate(row_rng, line[:7], 'F', 'B')
         col = iterate(col_rng, line[7:10], 'L', 'R')
-        #_id = row * 8 + col
         seats.append(Seat(row, col))
     return seats
 
@@ -36,13 +35,11 @@ class Seat:
         if _id is not None:
             self.row = _id // 8
             self.col = _id % 8
+            self.id = _id
         else:
             self.row = row
             self.col = col
-
-    @property
-    def id(self):
-        return self.row * 8 + self.col
+            self.id = self.row * 8 + self.col
 
     def __eq__(self, other):
         return self.id == other.id
@@ -50,26 +47,28 @@ class Seat:
     def taken(self, taken_seats):
         if self in taken_seats:
             return True
-        if (Seat(_id=self.id + 1) in taken_seats
-                and Seat(_id=self.id - 1) in taken_seats):
+        if (self + 1 in taken_seats and self - 1 in taken_seats):
             return False
         return True
 
-    def __next__(self):
-        self.col += 1
-        if self.col > 7:
-            self.col = 0
-            self.row += 1
-        return self
+    def __int__(self):
+        return self.id
+
+    def __add__(self, other):
+        return Seat(_id=int(self)+int(other))
+
+    def __sub__(self, other):
+        return Seat(_id=int(self)-int(other))
 
 def second_task(parsed_lines):
     my_seat = Seat(0,0)
     while True:
         if my_seat.taken(parsed_lines):
-            next(my_seat)
+            my_seat += 1
         else:
             break
-    #print(f'{my_seat.row}, {my_seat.col}')
+        if my_seat.id > 9999:
+            raise ValueError(f'Error: {my_seat.row}, {my_seat.col}')
     return my_seat.id
 
 def main():
