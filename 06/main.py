@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 import sys
-import re
 from string import ascii_lowercase
 
 
 def parse_in(std_in):
     res = std_in.split('\n\n')
-    res = map(lambda x: x.rstrip(), res)
-    return list(res)
+    res = [x.rstrip() for x in res]
+    return res
 
 def first_task(parsed):
     count = 0
@@ -18,7 +17,6 @@ def first_task(parsed):
     return count
 
 def second_task(parsed):
-    count = 0
     list_all_yes = []
     for group in parsed:
         persons = group.split('\n')
