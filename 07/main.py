@@ -10,22 +10,35 @@ class Bag:
         self.color = color_str
         self.contains = []
         self.is_contained = []
+        self.hash = hash(self.color)
 
     def __eq__(self, other):
         return self.color == str(other)
+
+    def __hash__(self):
+        return self.hash
 
     def __str__(self):
         return self.color
 
     def __repr__(self):
-        return self.color
+        return str(self)
 
     def full_repr(self):
         return f'\n{self.color}\nContains: {self.contains}\nIs contained: {self.is_contained}\n'
 
-    #def full_is_contained(self):
-    #    con = []
-    #    for c in self.is_contained()
+    def full_is_contained(self):
+        con = []
+        for c in self.is_contained:
+            con.append(c)
+            con += c.full_is_contained()
+        return con
+
+    def nr_contained(self):
+        count = 0
+        for c in self.contains:
+            count += c[0] * (c[1].nr_contained() + 1 )
+        return count
 
 def parse_content(con, bags):
     if con.startswith('no'):
@@ -56,17 +69,14 @@ def parse_in(std_in):
         b = bags[t[0]]
         b.contains = parse_content(t[1], bags)
         for c in b.contains:
-            bags[str(c[1])].is_contained.append(b)
-    print (bags['shiny gold bags'].full_repr())
+            bags[c[1]].is_contained.append(b)
     return bags
 
 def first_task(parsed):
-    count = 0
-    return count
+    return len(set(parsed['shiny gold bags'].full_is_contained()))
 
 def second_task(parsed):
-    count = 0
-    return count
+    return parsed['shiny gold bags'].nr_contained()
 
 def main():
     std_in = sys.stdin.readlines()
