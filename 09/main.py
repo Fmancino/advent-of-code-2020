@@ -24,7 +24,7 @@ def first_task(parsed):
 
 def second_task(parsed, first_res):
     lwr_idx = 0
-    upp_idx = 1
+    upp_idx = 2
     while upp_idx < len(parsed):
         rng = parsed[lwr_idx:upp_idx]
         sum_rng = sum(rng)
@@ -34,7 +34,7 @@ def second_task(parsed, first_res):
             return min(rng) + max (rng)
         else:
             lwr_idx += 1
-            if lwr_idx == upp_idx:
+            if lwr_idx == upp_idx - 1:
                 upp_idx += 1
     raise ValueError('bad input')
 
