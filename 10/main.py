@@ -26,19 +26,15 @@ def first_task(parsed):
 
 def is_valid(perm):
     for idx, val in enumerate(perm[0:-1]):
-        to_next = abs(perm[idx + 1] - val)
+        to_next = perm[idx + 1] - val
         if to_next not in [1,2,3]:
             return False
-    print(perm)
     return True
-
 
 def second_task(parsed):
     smaller = []
     last_idx = 0
-    print(parsed)
     for idx, val in enumerate(parsed[0:-1]):
-        print(smaller)
         to_next = parsed[idx + 1] - val
         if to_next == 3:
             smaller.append(parsed[last_idx:idx+1])
@@ -46,18 +42,21 @@ def second_task(parsed):
     valid_perms = []
     for s in smaller:
         valid_perm = 0
-        if len(s) in [1,2,3]:
+        if len(s) in [1,2]:
             # one is not interesting
             continue
-        for p in permutations(s[1:-1]):
+        all_perm = []
+        internal = s[1:-1]
+        all_perm.append(())
+        for i in range(1, len(internal)+1):
+            all_perm += list(permutations(internal, i))
+        for p in all_perm:
             p = list(p)
             p.append(s[-1])
             p.insert( 0, s[0])
-            print(p)
             if is_valid(p):
                 valid_perm += 1
         valid_perms.append(valid_perm)
-    print(valid_perms)
     mult = 1
     for p in valid_perms:
         mult *= p
