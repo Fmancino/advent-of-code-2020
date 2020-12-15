@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import copy
+from collections import deque
 
 def parse_in(std_in):
     ret = std_in.strip().split(',')
@@ -16,7 +17,29 @@ def first_task(parsed):
     return res[-1]
 
 def second_task(parsed):
-    return 0
+    res = {}
+    last_key = 0
+    for idx, key in enumerate(parsed):
+        if res.get(key) is None:
+            res[key] = deque([idx])
+        else:
+            res[key].append(idx)
+        last_key =  key
+        last_idx =  idx
+    while True:
+        if len(res[last_key]) == 2:
+            prev_pos = res[last_key].popleft()
+            key = res[last_key][0] - prev_pos
+        else:
+            key = 0
+        last_idx += 1
+        if res.get(key) is None:
+            res[key] = deque([last_idx])
+        else:
+            res[key].append(last_idx)
+        last_key = key
+        if last_idx == 30000000-1:
+            return last_key
 
 def reverse_find(_list, val):
     for i in range(-1, -len(_list) - 1, -1):
