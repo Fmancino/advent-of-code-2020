@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys
-import copy
 import re
 
 def parse_in(std_in):
@@ -27,6 +26,18 @@ def is_valid(nr, rules):
             valid = True
             break
     return valid
+def is_ticket_valid(ticket, rules):
+    for nr in ticket:
+        if not is_valid(nr, rules):
+            return False
+    return True
+
+def get_matches(nr, rules):
+    matches = []
+    for key, r in rules.items():
+        if in_range(nr, r[0]) or in_range(nr, r[1]):
+            matches += [key]
+    return matches
 
 def in_range(val, rng):
     return rng[0] <= val <= rng[1]
@@ -41,8 +52,56 @@ def first_task(parsed):
                 count += nr
     return count
 
+def in_each(element, lists):
+    for l in lists:
+        if element not in l:
+            return False
+    return True
+
+def get_possible_placements(valid_tickets, rules):
+    ''' temporary result, for each index give all possible rules that could fit '''
+    matches_db = []
+    for t in valid_tickets:
+        t_matches = []
+        for nr in t:
+            t_matches.append(get_matches(nr, rules))
+        matches_db.append(t_matches)
+    res = {idx: [] for idx in range(len(rules))}
+    for idx in range(len(rules)):
+        ms_idx = [m[idx] for m in matches_db]
+        for m in ms_idx[0]:
+            if in_each(m, ms_idx[1:]):
+                res[idx].append(m)
+    return res
+
 def second_task(parsed):
-    return 0
+    rules = parsed[0]
+    my_ticket = parsed[1]
+    near_tickets = parsed[2]
+    valid_tickets = [t for t in near_tickets if is_ticket_valid(t, rules)]
+    valid_tickets += [my_ticket]
+    res = get_possible_placements(valid_tickets, rules)
+    done = {}
+    while True:
+        # clean up, make sure we get one rule per each index
+        for idx, r in res.items():
+            if len(r) == 1:
+                val = res.pop(idx)[0]
+                done[idx] = val
+                break
+        for idx, r in res.items():
+            try:
+                r.remove(val)
+            except ValueError:
+                pass
+        if not res:
+            break
+    #print(done)
+    departure_idx = [idx for idx in done if done[idx].startswith('departure')]
+    mult = 1
+    for i in departure_idx:
+        mult *= my_ticket[i]
+    return mult
 
 def main():
     std_in = sys.stdin.read()
